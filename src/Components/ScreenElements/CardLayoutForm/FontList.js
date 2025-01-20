@@ -1,0 +1,16 @@
+export const fontList = [
+    {id: '1', fontFamily: 'Pacifico, cursive', fontWeight: 400, fontStyle: 'normal'},
+    {id: '2', fontFamily: 'Megrim, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '3', fontFamily: 'Jersey 15, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '4', fontFamily: 'Oswald, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '5', fontFamily: 'Titillium Web, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '5', fontFamily: 'Exo 2, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '6', fontFamily: 'Lobster, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '7', fontFamily: 'Caveat, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '8', fontFamily: 'Lilita One, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '9', fontFamily: 'Archivo Black, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '10', fontFamily: 'Abril Fatface, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '11', fontFamily: 'Shadows Into Light, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '12', fontFamily: 'Permanent Marker, serif', fontWeight: 400, fontStyle: 'normal'},
+    {id: '13', fontFamily: 'Orbitron, serif', fontWeight: 400, fontStyle: 'normal'},
+]
