@@ -10,5 +10,5 @@ export const PrivateRoutes = ({ authUser }) => {
             <Outlet />
         </Layout>
         :
-        <Navigate to='signin' />
+        <Navigate to='/' />
 }

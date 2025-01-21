@@ -19,7 +19,7 @@ const AuthContextProvider = ({ children }) => {
     try {
       console.log("search")
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select()
         .eq('email', `${email}`)
 
@@ -40,13 +40,19 @@ const AuthContextProvider = ({ children }) => {
   }
 
   const signInWithEmail = async ({ email }) => {
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: email,
-      options: {
-        shouldCreateUser: checkUserEmail(email),
-        emailRedirectTo: 'http://localhost:3000/cards',
-      },
-    })
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          shouldCreateUser: checkUserEmail(email)? false : true,
+          emailRedirectTo: 'http://localhost:3000/cards',
+        },
+      })
+    } catch (error) {
+      
+    }
+
   }
 
   const signOut = () => {
