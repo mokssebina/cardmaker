@@ -4,17 +4,17 @@ import { Description, Textarea } from '@headlessui/react'
 
 
 
-const TextAreaInput = ({ label, placeholder, name, value, onChange }) => {
+const MessagesInput = ({ label, placeholder, name, value, onChange }) => {
     return (
         <div className='w-full flex flex-col'>
             <p className="text-sm/6 text-gray-950">{label}</p>
             <Textarea name={name} as={Fragment}>
                 {({ focus, hover }) => (
-                    <textarea placeholder={placeholder} className={clsx('h-24 p-1 border border-gray-500 rounded-lg', focus && 'bg-blue-100', hover && 'shadow')} value={value} onChange={onChange}></textarea>
+                    <textarea placeholder={placeholder} className={clsx('h-36 p-1 border border-gray-500 rounded-lg', focus && 'bg-blue-100', hover && 'shadow')} value={value} onChange={onChange}></textarea>
                 )}
             </Textarea>
         </div>
     )
 }
 
-export default TextAreaInput
+export default MessagesInput

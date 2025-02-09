@@ -4,8 +4,8 @@ module.exports = {
   theme: {
     extend: {
       height: {
-        'content' : 'calc(100% - 96px)'
-      }
+        'content' : 'calc(100% - 112px)'
+      },
     },
   },
   plugins: [],

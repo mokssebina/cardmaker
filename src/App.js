@@ -3,19 +3,23 @@ import './App.css';
 import Layout from './Components/LayoutElements/Layout';
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from './Routes/Routes';
-import PreviewRoutes from './Routes/PreviewRoutes';
-import MainStack from './Stack/MainStack';
+import toast, { Toaster } from 'react-hot-toast';
+import { AuthContextProvider } from './Context/AuthContext';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-      {/*
-      <PreviewRoutes />
-      */}
-    </BrowserRouter>
+    <Provider store={store}>
+      <AuthContextProvider>
+        <BrowserRouter>
+          <Toaster />
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthContextProvider>
+    </Provider>
   );
 }
 

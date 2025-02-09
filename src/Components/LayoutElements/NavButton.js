@@ -18,7 +18,7 @@ const NavButton = ({ path, icon, title }) => {
 
     return (
         <Link to={path}>
-            <div className={`w-full h-16 px-10 py-5 flex flex-row space-x-4 rounded-lg cursor-pointer ${location.pathname === path && 'bg-gray-800'} text-white hover:bg-gray-800`}>
+            <div className={`w-full h-12 px-10 mb-1 py-3 flex flex-row space-x-4 rounded-lg cursor-pointer ${location.pathname === path && 'bg-gray-800 hover:bg-gray-800'} text-white hover:bg-gray-900`}>
                 {icon}
                 <p>{title}</p>
             </div>

@@ -1,4 +1,4 @@
-import { PlusCircleIcon, BookOpenIcon } from '@heroicons/react/24/outline'
+import { PencilSquareIcon, BookOpenIcon, QueueListIcon } from '@heroicons/react/24/outline'
 
 
 export const navRoutes = [
@@ -10,8 +10,14 @@ export const navRoutes = [
     },
     {
         id: '2',
-        path: '/new-card',
-        title: 'New Card',
-        icon: <PlusCircleIcon />
+        path: '/edit-card',
+        title: 'Edit Card',
+        icon: <PencilSquareIcon />
+    },
+    {
+        id: '3',
+        path: '/purchases',
+        title: 'Purchases',
+        icon: <PencilSquareIcon />
     }
 ]
