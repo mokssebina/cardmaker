@@ -1,9 +1,26 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+
+//////////////---Formik imports---////////////////////
+import { useDispatch, useSelector } from 'react-redux';
+
+//////////////---Navigation imports---////////////////////
 import { useNavigate } from "react-router-dom";
+
+//////////////---Supabase imports---////////////////////
 import { supabase } from "../supabase/supabaseClient";
 import { Session, User } from '@supabase/supabase-js';
+
+//////////////---Toast imports---////////////////////
 import { toast } from 'react-hot-toast'
+
+//////////////---Nanoid imports---////////////////////
 import { nanoid } from "nanoid";
+
+//////////////---Paddlen imports---////////////////////
+import { initializePaddle, Paddle } from '@paddle/paddle-js';
+
+//////////////---API imports---////////////////////
+import { getUserProfile } from "../Pages/Slices/GetUserProfile";
 
 
 
@@ -16,9 +33,29 @@ export const useAuth = () => {
 
 const AuthContextProvider = ({ children }) => {
 
+  const dispatch = useDispatch()
+
+  const { userProfile, profileLoading, profileError } = useSelector((state) => state.getuserprofile);
+
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [preview, setPreview] = useState(false)
+  const [card, setCard] = useState(null)
+  // Create a local state to store Paddle instance
+  const [paddle, setPaddle] = useState();
+
+  const togglePreview = () => {
+    setPreview(!preview)
+  }
+
+  const setPreviewValues = (value) => {
+    setCard(value)
+  } 
+
+  const clearPreviewValues = () => {
+    setCard(null)
+  }
 
   const checkUserEmail = async (id, userName, userEmail) => {
     try {
@@ -77,7 +114,8 @@ const AuthContextProvider = ({ children }) => {
           "lightText": "#ffffff",
           "darkText": "#030712",
           "birthdayMessage": "Finish message here",
-          "messages": null
+          "messages": null,
+          "layout": "default"
         },
         created_at: new Date()
        })
@@ -95,11 +133,11 @@ const AuthContextProvider = ({ children }) => {
 
   }
 
-  const pushToProfile = async (name, userId) => {
+  const pushToProfile = async (firstName, lastName, name, userId) => {
 
     const { error } = await supabase
       .from('profiles')
-      .update({ user_name: name })
+      .update({ first_name: firstName, last_name: lastName, user_name: name, credits: 0 })
       .eq('id', userId)
 
     if (error) {
@@ -114,7 +152,7 @@ const AuthContextProvider = ({ children }) => {
 
   }
 
-  const signUpWithEmail = async (userName, userEmail, userPassword) => {
+  const signUpWithEmail = async (firstName, lastName, userName, userEmail, userPassword) => {
     try {
       setLoading(true)
 
@@ -127,7 +165,7 @@ const AuthContextProvider = ({ children }) => {
       if (data && data?.session) {
         setLoading(false)
         console.log('user data: ', data)
-        pushToProfile(userName, data.user.id)
+        pushToProfile(firstName, lastName, userName, data.user.id)
       }
 
       if (error) {
@@ -190,15 +228,56 @@ const AuthContextProvider = ({ children }) => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      dispatch(getUserProfile(session?.user.id))
     })
 
     return () => authListener.subscription.unsubscribe()
 
   }, [])
+
+  useEffect(() => {
+    //Paddle.Environment.set("sandbox");
+    initializePaddle({ 
+      environment: process.env.PADDLE_ENVIRONMENT_KEY, 
+      token: process.env.PADDLE_AUTH_TOKEN 
+    }).then(
+      (paddleInstance) => {
+        if (paddleInstance) {
+          setPaddle(paddleInstance);
+        }
+      },
+    );
+  }, []);
+
+  const updateCredits = (value) => {
+    console.log("credits: ",value)
+  }
+
+  const openCheckout = (priceId, email, quantity) => {
+
+    var settings = {
+      displayMode: "overlay",
+      theme: "light",
+      locale: "en",
+      frameTarget: "checkout-container",
+      frameStyle: "min-width: 600px;",
+      frameInitialHeight: "450"
+    };
+
+
+    paddle?.Checkout.open({
+      settings: settings,
+      items: [{ priceId: priceId, quantity: quantity }],
+      customer: {
+        email: email
+      },
+      successCallback: updateCredits(userProfile?.credits)
+    });
+  };
   
 
   return (
-    <AuthContext.Provider value={{ session, loading, signInWithEmail, signUpWithEmail, signOut }}>
+    <AuthContext.Provider value={{ session, loading, preview, togglePreview, signInWithEmail, signUpWithEmail, signOut, openCheckout }}>
       {children}
     </AuthContext.Provider>
   )

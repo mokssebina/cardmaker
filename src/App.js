@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Layout from './Components/LayoutElements/Layout';
@@ -11,6 +12,8 @@ import { store } from './store/store';
 
 
 function App() {
+
+
   return (
     <Provider store={store}>
       <AuthContextProvider>

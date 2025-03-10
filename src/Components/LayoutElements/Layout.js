@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useContext, Fragment } from 'react'
-import { Transition } from "@headlessui/react";
+
+//////////////---Navigation imports---////////////////////
 import { useLocation } from 'react-router-dom';
+
+//////////////---Animation imports---////////////////////
 import { motion } from "framer-motion";
+
+//////////////---Screen imports---////////////////////
 import Sidebar from './Sidebar';
 import Header from './Header';
+
+//////////////---Context imports---////////////////////
+import { useAuth } from '../../Context/AuthContext';
 
 
 
@@ -12,6 +20,8 @@ const Layout = ({ children }) => {
     const location = useLocation()
     const [showNav, setShowNav] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+
+    const { preview, togglePreview } = useAuth()
 
 
     return (
@@ -26,27 +36,33 @@ const Layout = ({ children }) => {
             }}
         >
 
-            {location.pathname?.includes('preview') ?
-                <div className='w-screen h-screen bg-white overscroll-none'>
-                    {children}
-                </div>
-                :
-                <>
-                    <div className='w-screen h-screen flex flex-row bg-white overscroll-none'>
+            <div className='w-screen h-screen flex flex-row bg-white overscroll-none'>
 
-                        <Sidebar />
-
-                        <main className={`${location.pathname?.includes('preview') ? 'w-full' : 'xl:w-4/5'} h-full`}>
-
-                            <Header />
-
-                            <div className='w-full h-content px-2 pb-5 overflow-scroll'>{children}</div>
-
-                        </main>
-
+                {/*preview &&
+                    <div className='relative w-screen h-screen bg-white overscroll-none z-30'>
+                        {children}
+                        <button onClick={() => togglePreview()} type='submit' className="fixed right-8 bottom-8 w-32 h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 z-10 text-white data-[hover]:bg-gray-800">
+                            ← Back
+                        </button>
                     </div>
-                </>
-            }
+                */}
+
+                {!preview && <Sidebar />}
+
+                <main className={`${preview ? 'w-full' : 'xl:w-4/5'} h-full`}>
+
+                    {!preview && <Header />}
+
+                    <div className={`${preview ? 'w-full h-full' : 'w-full h-content px-2 pb-5 overflow-scroll'}`}>{children}</div>
+
+                    {preview &&
+                        <button onClick={() => togglePreview()} type='submit' className="fixed right-8 bottom-8 w-32 h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 z-10 text-white data-[hover]:bg-gray-800">
+                            ← Back
+                        </button>
+                    }
+                </main>
+
+            </div>
 
         </motion.div>
     )

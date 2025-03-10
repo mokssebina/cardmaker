@@ -4,6 +4,9 @@ import Layout from "../Components/LayoutElements/Layout";
 
 
 
-export const OpenRoutes = ({ authUser }) => {
-    return authUser || !authUser && <Outlet />
+export const PrivatePreviewRoutes = ({ authUser }) => {
+    return authUser ?
+        <Outlet />
+        : 
+        null
 }

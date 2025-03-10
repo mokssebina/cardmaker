@@ -16,6 +16,8 @@ const Signup = () => {
     const navigate = useNavigate()
 
     let validation = Yup.object().shape({
+        firstName: Yup.string().required(),
+        lastName: Yup.string().required(),
         username: Yup.string().required(),
         email: Yup.string().required(),
         password: Yup.string().required()
@@ -23,6 +25,8 @@ const Signup = () => {
 
     const authSignipFormik = useFormik({
         initialValues: {
+            firstName: '',
+            lastName: '',
             username: '',
             email: '',
             password: ''
@@ -30,7 +34,7 @@ const Signup = () => {
         validationSchema: validation,
         onSubmit: values => {
             //alert(JSON.stringify(values, null, 2));
-            signUpWithEmail(values.username, values.email, values.password)
+            signUpWithEmail(values.firstName, values.lastName, values.username, values.email, values.password)
         }
     })
 
@@ -41,13 +45,62 @@ const Signup = () => {
 
                 <div className='w-44 h-16 bg-slate-500 mx-auto mb-9'></div>
 
-                <InputText label={'Username'} type={'username'} placeholder={'Enter your username'} name={'username'} value={authSignipFormik?.values.username} onChange={authSignipFormik?.handleChange('username')} />
-
-                <InputText label={'Email'} type={'email'} placeholder={'Enter your email'} name={'email'} value={authSignipFormik?.values.email} onChange={authSignipFormik?.handleChange('email')} />
-
-                <InputText label={'Password'} type={'password'} placeholder={'Enter your password'} name={'password'} value={authSignipFormik?.values.password} onChange={authSignipFormik?.handleChange('password')} />
+                <InputText 
+                label={'First name'} 
+                type={'firstName'} 
+                placeholder={'Enter your first name'} 
+                name={'firstName'} 
+                value={authSignipFormik?.values.firstName} 
+                onChange={authSignipFormik?.handleChange('firstName')} 
+                touched={authSignipFormik?.touched.firstName}
+                error={(authSignipFormik.touched.firstName && authSignipFormik.errors.firstName) && authSignipFormik.errors.firstName}
+                />
                 
-                <button type='submit' className="w-full h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 text-white data-[hover]:bg-gray-800">
+                <InputText 
+                label={'Last name'} 
+                type={'lastName'} 
+                placeholder={'Enter your last name'} 
+                name={'lastName'} 
+                value={authSignipFormik?.values.lastName} 
+                onChange={authSignipFormik?.handleChange('lastName')} 
+                touched={authSignipFormik?.touched.lastName}
+                error={(authSignipFormik.touched.lastName && authSignipFormik.errors.lastName) && authSignipFormik.errors.lastName}
+                />
+
+                <InputText 
+                label={'Username'} 
+                type={'username'} 
+                placeholder={'Enter your username'} 
+                name={'username'} 
+                value={authSignipFormik?.values.username} 
+                onChange={authSignipFormik?.handleChange('username')} 
+                touched={authSignipFormik?.touched.username}
+                error={(authSignipFormik.touched.username && authSignipFormik.errors.username) && authSignipFormik.errors.username}
+                />
+
+                <InputText 
+                label={'Email'} 
+                type={'email'} 
+                placeholder={'Enter your email'} 
+                name={'email'} 
+                value={authSignipFormik?.values.email} 
+                onChange={authSignipFormik?.handleChange('email')} 
+                touched={authSignipFormik?.touched.email}
+                error={(authSignipFormik.touched.email && authSignipFormik.errors.email) && authSignipFormik.errors.email}
+                />
+
+                <InputText 
+                label={'Password'} 
+                type={'password'} 
+                placeholder={'Enter your password'} 
+                name={'password'} 
+                value={authSignipFormik?.values.password} 
+                onChange={authSignipFormik?.handleChange('password')} 
+                touched={authSignipFormik?.touched.password}
+                error={(authSignipFormik.touched.password && authSignipFormik.errors.password) && authSignipFormik.errors.password}
+                />
+                
+                <button type='submit' className="relative w-full h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 text-white data-[hover]:bg-gray-800">
                     {loading? <CircularProgress size={20} color='#ffffff' /> : 'Continue →'}
                 </button>
                 

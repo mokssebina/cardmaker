@@ -4,7 +4,8 @@ module.exports = {
   theme: {
     extend: {
       height: {
-        'content' : 'calc(100% - 112px)'
+        'content' : 'calc(100% - 112px)',
+        'pricepanel' : 'calc(100vh - 112px)'
       },
     },
   },

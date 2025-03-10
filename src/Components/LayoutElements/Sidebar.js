@@ -7,13 +7,13 @@ import { useAuth } from '../../Context/AuthContext'
 
 
 
-const Sidebar = () => {
+const Sidebar = ({ preview }) => {
 
     const location = useLocation()
     const { signOut } = useAuth()
 
     return (
-        <div className='w-1/5 h-full p-5'>
+        <div className={`relative w-1/5 h-full p-5 ${preview? 'z-0' : ''}`}>
             <div className='w-full h-full rounded-lg p-2 bg-gray-950 border-2 flex flex-col space-y-1'>
 
                 <div className='relative top-0 w-full h-16 mb-8'></div>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { supabase } from "../../../../supabase/supabaseClient";
+import { supabase } from "../../supabase/supabaseClient";
 
 
 export const submitMessage = createAsyncThunk("submitmessage/submitMessage",async (messageData, { rejectWithValue }) => {
@@ -15,7 +15,7 @@ export const submitMessage = createAsyncThunk("submitmessage/submitMessage",asyn
       return data;
       
     } catch (error) {
-      return rejectWithValue(error.message || "Failed to fetch cards");
+      return rejectWithValue(error.message || "Failed to submit message");
     }
   }
 );
@@ -41,7 +41,7 @@ const submitMessageSlice = createSlice({
       })
       .addCase(submitMessage.rejected, (state, action) => {
         state.submitMessageLoading = false;
-        state.submitMessageError = action.payload.message;
+        state.submitMessageError = action.error.message;
       })
   },
 });
