@@ -24,7 +24,7 @@ import { getCardMessages } from '../Slices/GetMessagesSlice';
 
 
 
-const CardPreview = ({ lightTheme, darkTheme, template, cardTitle, lightText, darkText, titleFont, introText, coverImage, birthdayMessage, messages }) => {
+const CardPreview = ({ lightTheme, darkTheme, template, cardTitle, lightText, darkText, titleFont, introText, coverImage, birthdayMessage, messages, daySwitch }) => {
 
     /*
     const dispatch = useDispatch()
@@ -59,11 +59,13 @@ const CardPreview = ({ lightTheme, darkTheme, template, cardTitle, lightText, da
 
     const [day, setDay] = useState(true)
 
+    const gif = 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmIxdnFyYnBvOW1qNXF5enJpdnhrZ2ZhZWt4anhxM21wMXo1cWI0diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6UAk2UiNKDBBQn5NUX/giphy.gif'
+
     useEffect(() => {
-        if(template !== 'default'){
+        if (template !== 'default') {
             console.log('template', template)
         }
-    },[])
+    }, [])
 
 
     return (
@@ -82,7 +84,17 @@ const CardPreview = ({ lightTheme, darkTheme, template, cardTitle, lightText, da
 
                         <div className='relative w-full h-1/2 pt-4'>
 
-                            <CardHeader day={day} setDay={() => setDay(!day)} cardTitle={cardTitle} headerLight={lightTheme} headerDark={darkTheme} lightColor={lightText} darkColor={darkText} font={titleFont} />
+                            <CardHeader
+                                day={day}
+                                setDay={() => setDay(!day)}
+                                cardTitle={cardTitle}
+                                headerLight={lightTheme}
+                                headerDark={darkTheme}
+                                lightColor={lightText}
+                                darkColor={darkText}
+                                font={titleFont}
+                                daySwitch={daySwitch}
+                            />
 
                         </div>
 

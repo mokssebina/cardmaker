@@ -102,7 +102,7 @@ const MessageDialog = ({ closeSendMessage, open, sendMessageLoading, cardId }) =
 
                                 <Tooltip title={messagesCheck?.length === 5 && "The maximum number of messages for this card have been sent."} arrow={true}>
                                     <div className='relative w-full'>
-                                        <button disabled={messagesCheckError || messagesCheck?.length === 5 || submitMessageLoading} className={`relative w-1/2 h-14 mt-8 text-center ml-[25%] rounded ${messagesCheckError || messagesCheck?.length === 10 ? 'bg-gray-500' : 'bg-gray-900'} cursor-pointer text-white`} type='submit'>{submitMessageLoading ? <CircularProgress size={20} color='#ffffff' /> : 'Send Message'}</button>
+                                        <button disabled={messagesCheckError || submitMessageLoading} className={`relative w-1/2 h-14 mt-8 text-center ml-[25%] rounded ${messagesCheckError || messagesCheck?.length === 10 ? 'bg-gray-500' : 'bg-gray-900'} cursor-pointer text-white`} type='submit'>{submitMessageLoading ? <CircularProgress size={20} color='#ffffff' /> : 'Send Message'}</button>
                                     </div>
                                 </Tooltip>
 

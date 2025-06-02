@@ -1,22 +1,55 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+
+//////////////---Animation imports---////////////////////
+import { motion } from "framer-motion";
+
+//////////////---Navigation imports---////////////////////
 import { useLocation } from 'react-router-dom'
+
+//////////////---Icon imports---////////////////////
 import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
+import CloseIcon from '@mui/icons-material/Close';
+
+//////////////---Screen imports---////////////////////
 import NavButton from './NavButton'
+
+//////////////---Routes imports---////////////////////
 import { navRoutes } from './appRoutes'
+
+//////////////---Context imports---////////////////////
 import { useAuth } from '../../Context/AuthContext'
 
 
 
-const Sidebar = ({ preview }) => {
+const Sidebar = () => {
 
     const location = useLocation()
-    const { signOut } = useAuth()
-
+    const { device, signOut } = useAuth()
+  
     return (
-        <div className={`relative w-1/5 h-full p-5 ${preview? 'z-0' : ''}`}>
-            <div className='w-full h-full rounded-lg p-2 bg-gray-950 border-2 flex flex-col space-y-1'>
+        <motion.div
+            key="panel"
+            initial={{ x: "-100%" }}  // Start off-screen (hidden)
+            animate={{ x: "0%" }}    // Slide in
+            exit={{ x: "-100%" }}      // Slide out
+            transition={{ duration: 0.5, ease: "easeInOut" }} // Smooth transition
+            //initial={{ x: "100%" }}
+            //animate={{ x: openPay ? "0%" : "100%" }}
+            //transition={{ type: "spring", stiffness: 80 }}
+            className={`relative w-1/5 h-full p-5`}
+        >
+            <div className='w-full h-full rounded-[16px] p-2 bg-gray-950 border-2 flex flex-col space-y-1'>
 
-                <div className='relative top-0 w-full h-16 mb-8'></div>
+                <div className='relative top-0 w-full h-16 flex flex-row mb-8'>
+
+                    {/*
+                    device !== 'Desktop' &&
+                        <button onClick={setShowNav} className='h-10 w-10 ml-auto aspect-auto text-white'>
+                            <CloseIcon />
+                        </button>
+                    */}
+
+                </div>
 
                 <div className='relative w-full h-content'>
                     {navRoutes.map((item) => (
@@ -32,7 +65,8 @@ const Sidebar = ({ preview }) => {
                 </button>
 
             </div>
-        </div>
+
+        </motion.div>
     )
 }
 

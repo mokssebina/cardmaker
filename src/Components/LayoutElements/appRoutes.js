@@ -4,14 +4,14 @@ import { PencilSquareIcon, BookOpenIcon, QueueListIcon } from '@heroicons/react/
 export const navRoutes = [
     {
         id: '1',
-        path: '/cards',
-        title: 'Cards',
+        path: '/pages',
+        title: 'Pages',
         icon: <BookOpenIcon />
     },
     {
         id: '2',
-        path: '/edit-card',
-        title: 'Edit Card',
+        path: '/edit-page',
+        title: 'Edit Page',
         icon: <PencilSquareIcon />
     },
     {

@@ -20,15 +20,20 @@ export const submitMessage = createAsyncThunk("submitmessage/submitMessage",asyn
   }
 );
 
+const initialState = {
+  submitMessageResponse: null,
+  submitMessageLoading: false,
+  submitMessageError: null,
+}
 
 const submitMessageSlice = createSlice({
   name: "submitmessage",
-  initialState: {
-    submitMessageResponse: null,
-    submitMessageLoading: false,
-    submitMessageError: null,
+  initialState,
+  reducers: {
+    resetSubmitMessage: (state, action) => {
+      return initialState
+    }
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(submitMessage.pending, (state) => {
@@ -45,6 +50,8 @@ const submitMessageSlice = createSlice({
       })
   },
 });
+
+export const { resetSubmitMessage } = submitMessageSlice.actions
 
 export default submitMessageSlice.reducer;
 

@@ -83,7 +83,17 @@ const Card = () => {
 
                                     <div className='relative w-full h-1/2 pt-4'>
 
-                                        <CardHeader day={day} setDay={() => setDay(!day)} cardTitle={cardValues?.cardTitle} headerLight={cardValues?.lightTheme} headerDark={cardValues?.darkTheme} lightColor={cardValues?.lightText} darkColor={cardValues?.darkText} font={cardValues?.titleFont} />
+                                        <CardHeader
+                                            day={day}
+                                            setDay={() => setDay(!day)}
+                                            cardTitle={cardValues?.cardTitle}
+                                            headerLight={cardValues?.lightTheme}
+                                            headerDark={cardValues?.darkTheme}
+                                            lightColor={cardValues?.lightText}
+                                            darkColor={cardValues?.darkText}
+                                            font={cardValues?.titleFont}
+                                            daySwitch={cardValues?.switch}
+                                        />
 
                                     </div>
 

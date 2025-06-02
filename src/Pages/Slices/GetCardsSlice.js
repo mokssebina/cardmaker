@@ -18,15 +18,20 @@ export const fetchCards = createAsyncThunk("getcards/fetchCards",async (id, { re
   }
 );
 
+const initialState = {
+  cards: null,
+  cardsLoading: false,
+  getCardsError: null,
+}
 
 const cardsSlice = createSlice({
   name: "getcards",
-  initialState: {
-    cards: null,
-    cardsLoading: false,
-    getCardsError: null,
+  initialState,
+  reducers: {
+    resetFetchCards: (state, action) => {
+      return initialState
+    }
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCards.pending, (state) => {
@@ -43,6 +48,8 @@ const cardsSlice = createSlice({
       })
   },
 });
+
+export const { resetFetchCards } = cardsSlice.actions
 
 export default cardsSlice.reducer;
 

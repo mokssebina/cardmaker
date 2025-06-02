@@ -1,6 +1,6 @@
 export const cardBundles = [
     {
-        id: 'pro_01jns7w9tsq01g0g9a9j0vgzs0',
+        id: 'pri_01jns7ygtzyj8yj0cgs6e42b1k',
         type: 'Solo',
         buypackage: '1 Card Credit',
         features: [
@@ -18,7 +18,7 @@ export const cardBundles = [
         quantity: 1
     },
     {
-        id: 'pro_01jnyb3r44n94xwqpee434cz7r',
+        id: 'pri_01jnyb5738w3wt7c9k7kyk5pj7',
         type: 'Good things come in threes.',
         buypackage: '3 Card Credit',
         features: [
@@ -36,7 +36,7 @@ export const cardBundles = [
         quantity: 3
     },
     {
-        id: 'pro_01jnyb82g1p9257s2db9t47hjz',
+        id: 'pri_01jnyb8shsxttmv9h17jhtpctc',
         type: 'Perfect 10!',
         buypackage: '10 Card Credit',
         features: [

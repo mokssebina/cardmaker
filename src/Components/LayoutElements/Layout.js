@@ -4,67 +4,139 @@ import React, { useState, useEffect, useContext, Fragment } from 'react'
 import { useLocation } from 'react-router-dom';
 
 //////////////---Animation imports---////////////////////
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 //////////////---Screen imports---////////////////////
 import Sidebar from './Sidebar';
 import Header from './Header';
+import MobileSidebar from './MobileSidebar';
 
 //////////////---Context imports---////////////////////
 import { useAuth } from '../../Context/AuthContext';
+
+//////////////---Pay panel imports---////////////////////
+import PayPanel from '../../Pages/BuilderPages/PayPanel';
+
+//////////////---Hook imports---////////////////////
+import useDeviceDetection from '../../Hooks/useDeviceDetection';
 
 
 
 const Layout = ({ children }) => {
 
     const location = useLocation()
-    const [showNav, setShowNav] = useState(false);
+
+    const { showNav, setShowNav, device, preview, togglePreview, panel, setPanel } = useAuth()
+
     const [isMobile, setIsMobile] = useState(false);
 
-    const { preview, togglePreview } = useAuth()
+    //const deviceType = useDeviceDetection()
+
+    useEffect(() => {
+
+        if (device) {
+            console.log("current device: ", device)
+        } else {
+            console.log("none")
+        }
+
+    }, [])
+
+    const panelVariants = {
+        closed: {
+            x: '100%',
+            transition: {
+                type: 'spring',
+                stiffness: 400,
+                damping: 40
+            }
+        },
+        open: {
+            x: '0%',
+            transition: {
+                type: 'spring',
+                stiffness: 400,
+                damping: 30
+            }
+        }
+    };
+
+    // Overlay animation variants
+    const overlayVariants = {
+        closed: {
+            opacity: 0,
+            transition: {
+                delay: 0.2
+            }
+        },
+        open: {
+            opacity: 1
+        }
+    };
+
+    const openSideNav = () => {
+        console.log("open side nav")
+        setShowNav(true)
+    }
 
 
     return (
-        <motion.div
-            initial={{ x: 300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 300, opacity: 0 }}
-            transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-            }}
-        >
 
-            <div className='w-screen h-screen flex flex-row bg-white overscroll-none'>
+        <div className={`w-screen h-screen ${device === 'Desktop' && 'flex flex-row'} bg-white overscroll-none`}>
 
-                {/*preview &&
-                    <div className='relative w-screen h-screen bg-white overscroll-none z-30'>
-                        {children}
-                        <button onClick={() => togglePreview()} type='submit' className="fixed right-8 bottom-8 w-32 h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 z-10 text-white data-[hover]:bg-gray-800">
-                            ← Back
-                        </button>
-                    </div>
-                */}
+            {panel &&
+                <>
+                    <PayPanel openPay={panel} close={() => setPanel(!panel)} />
+                    <motion.div
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={overlayVariants}
+                        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    />
+                </>
+            }
 
-                {!preview && <Sidebar />}
-
-                <main className={`${preview ? 'w-full' : 'xl:w-4/5'} h-full`}>
-
-                    {!preview && <Header />}
-
-                    <div className={`${preview ? 'w-full h-full' : 'w-full h-content px-2 pb-5 overflow-scroll'}`}>{children}</div>
-
-                    {preview &&
-                        <button onClick={() => togglePreview()} type='submit' className="fixed right-8 bottom-8 w-32 h-12 rounded bg-gray-950 py-2 px-4 text-sm mt-14 z-10 text-white data-[hover]:bg-gray-800">
-                            ← Back
-                        </button>
+            {preview ?
+                null
+                :
+                <>
+                    {(showNav && device !== 'Desktop') && <MobileSidebar setShowNav={() => setShowNav(false)} />}
+                    {(showNav && device !== 'Desktop') &&
+                        <motion.div
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            variants={overlayVariants}
+                            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                        />
                     }
-                </main>
+                </>
+            }
 
-            </div>
+            {preview ?
+                null
+                :
+                <>
+                    {device === 'Desktop' && <Sidebar device={device} />}
+                </>
+            }
+            <main className={`${preview ? 'w-full' : 'xl:w-4/5'} h-full`}>
 
-        </motion.div>
+                {!preview && <Header showNav={() => setShowNav(true)} device={device} />}
+
+                <div className={`${preview ? 'w-full h-full' : 'w-full h-content px-2 pb-5 overflow-scroll'}`}>{children}</div>
+
+                {preview &&
+                    <button onClick={() => togglePreview()} type='submit' className="fixed right-8 bottom-8 w-32 h-12 rounded shadow-md border border-white bg-gray-950 py-2 px-4 text-sm mt-14 z-10 text-white data-[hover]:bg-gray-800">
+                        ← Back
+                    </button>
+                }
+            </main>
+
+        </div>
+
+
     )
 }
 

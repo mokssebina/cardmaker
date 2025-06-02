@@ -2,21 +2,25 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { supabase } from '../../supabase/supabaseClient'
 
 
-export const signInUser = createAsyncThunk('signin/signInUser', async (email) => {
-    const reseponse = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: 'http://localhost:3000/cards',
-        },
-    })
+export const signInUser = createAsyncThunk('signin/signInUser', async (user, { rejectWithValue }) => {
 
-    return reseponse
-})
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: user.userEmail,
+            password: user.userPassword
+          })
+        if (error) throw error;
+        console.log("messages response: ", data)
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.message || "Failed to sign in user.");
+    }
+}
+)
 
 const initialState = {
     signinLoader: false,
-    signinMessage: '',
+    signinData: null,
     signinErrorMessage: '',
     signinStatusCode: null
 }
@@ -35,7 +39,7 @@ const signInUserSlice = createSlice({
         })
         builder.addCase(signInUser.fulfilled, (state, action) => {
             state.signinLoader = false
-            state.signinMessage = 'A message has been sent to your email.'
+            state.signinData = action.payload
         })
         builder.addCase(signInUser.rejected, (state, action) => {
             state.signinLoader = false

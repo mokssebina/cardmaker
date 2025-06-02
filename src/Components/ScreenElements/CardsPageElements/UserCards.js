@@ -13,8 +13,6 @@ import UserCardPreview from './UserCardPreview';
 
 const UserCards = ({ cardTitle, font, cardName, bgImage, lightColor, darkColor, introText, img, paid, openCard }) => {
 
-    const print = () => { console.log("clicked!") }
-
     return (
         <div className='relative w-full h-auto aspect-video flex flex-col rounded-lg p-1'>
             
@@ -22,16 +20,16 @@ const UserCards = ({ cardTitle, font, cardName, bgImage, lightColor, darkColor, 
                 <UserCardPreview cardTitle={cardTitle} font={font} bgImage={bgImage} lightColor={lightColor} darkColor={darkColor} introText={introText} img={img} />
             </div>
             
-            <div id='buttons' className='w-full h-12 text-sm px-1 flex flex-row'>
+            <div id='buttons' className='w-full flex flex-row align-middle items-center'>
                 {paid === "paid" &&
-                    <div className='w-10 h-10 py-2'>
-                        <AttachMoneyOutlined />
+                    <div className='w-6 h-6 text-xs md:text-base md:w-10 md:h-10 md:py-2'>
+                        <AttachMoneyOutlined className='md:text-base' />
                     </div>
                 }
-                <p className='mt-2 cursor-pointer'>{cardName}</p>
+                <p className='text-sm md:text-base cursor-pointer'>{cardName}</p>
 
-                <button type='button' onClick={openCard} className='w-10 h-10 ml-auto rounded-lg hover:border-2 border-gray-900 cursor-pointer'>
-                    <OpenInNewOutlined />
+                <button type='button' onClick={openCard} className='w-6 h-6 text-xs md:text-base md:w-10 md:h-10 lg:w-10 lg:h-10 ml-auto rounded-lg hover:border-2 border-gray-900 cursor-pointer'>
+                    <OpenInNewOutlined className='text-xs md:text-base' />
                 </button>
             </div>
         </div>

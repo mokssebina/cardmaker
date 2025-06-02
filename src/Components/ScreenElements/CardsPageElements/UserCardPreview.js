@@ -8,12 +8,12 @@ const UserCardPreview = ({ cardTitle, bgImage, font, lightColor, darkColor, intr
                 <div className="relative w-full h-1/4 px-2">
                     <div className='w-full h-1/2 pt-2'>
                         <div className='w-1/3 h-3 mx-auto py-[2px] border border-gray-950 rounded-[3px] items-center text-center'>
-                            <p style={{fontFamily: `${font}`}} className='text-[4px]'>{cardTitle}</p>
+                            {/*<p style={{fontFamily: `${font}`}} className='text-[4px]'>{cardTitle}</p>*/}
                         </div>
                     </div>
                     <div className='relative w-full h-1/2 py-1'>
                     <div className='relative w-2/5 mx-auto h-full p-[2px]'>
-                    <p style={{ color: `${darkColor}` }} className='relative text-[4px]'>{introText}</p>
+                    {/*<p style={{ color: `${darkColor}` }} className='relative text-[4px]'>{introText}</p>*/}
                     </div>
                     </div>
                 </div>

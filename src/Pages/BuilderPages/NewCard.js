@@ -1,5 +1,5 @@
 //////////////---React imports---////////////////////
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useRef } from 'react';
 
 //////////////---Headless ui imports---////////////////////
 import { Button, Switch, Input } from '@headlessui/react';
@@ -27,6 +27,7 @@ import CardLayoutForm from '../../Components/ScreenElements/CardLayoutForm/CardL
 import CardPreview from './CardPreview';
 import ConfirmDialog from '../../Components/ScreenElements/CardLayoutForm/ConfirmDialog';
 import MessageDialog from '../../Components/ScreenElements/CardLayoutForm/MessageDialog';
+import TemplateImages from '../../Components/ScreenElements/CardLayoutForm/TemplateImages';
 
 //////////////---Data imports---////////////////////
 import { fontList } from '../../Components/ScreenElements/CardLayoutForm/FontList';
@@ -46,23 +47,30 @@ import clipboard from 'clipboardy';
 import { toast } from 'react-hot-toast';
 
 //////////////---API imports---////////////////////
-import { fetchCards } from '../Slices/GetCardsSlice';
-import { getCardMessages } from '../Slices/GetMessagesSlice';
-import { updateCardMessage } from '../Slices/UpdateMessageSlice';
-import { deleteCardMessage } from '../Slices/DeleteMessageSlice';
+import { fetchCards, resetFetchCards } from '../Slices/GetCardsSlice';
+import { getCardMessages, resetGetCardMessages } from '../Slices/GetMessagesSlice';
+import { uploadCardImage } from '../Slices/ImageUploadSlice';
+import { resetSubmitMessage } from '../Slices/SubmitMessageSlice';
+import { updateCardMessage, resetUpdateCardMessage } from '../Slices/UpdateMessageSlice';
+import { deleteCardMessage, resetDeleteCardMessage } from '../Slices/DeleteMessageSlice';
+import { updateCard, resetUpdateCard } from '../Slices/UpdateCard';
 
 
 
 const NewCard = () => {
 
-    const { session, preview, togglePreview } = useAuth()
+    const { setShowNav, session, preview, togglePreview } = useAuth()
     const dispatch = useDispatch()
+    const fileInputRef = useRef(null);
+
     const { cards, cardsLoading, getCardsError } = useSelector((state) => state.getcards);
+    const { imageData, imageLoading, imageDataError } = useSelector((state) => state.cardimage);
     const { cardMessages, cardMessagesLoading, getCardMessagesError } = useSelector((state) => state.getcardmessages);
     const { updatedMessage, updatedMessageLoading, updatedMessageError } = useSelector((state) => state.updatemessage);
     const { deletedMessage, deletedMessageLoading, deletedMessageError } = useSelector((state) => state.deletemessage);
     const { submitMessageResponse, submitMessageLoading, submitMessageError } = useSelector((state) => state.submitmessage);
-
+    const { createCardData, createCardLoading, createCardError } = useSelector((state) => state.createcard);
+    const { updatedCardData, updatedCardLoading, updatedCardError } = useSelector((state) => state.updatecard);
 
     const [day, setDay] = useState(true)
     const [selected, setSelected] = useState({
@@ -91,10 +99,28 @@ const NewCard = () => {
     const [messageId, setMessageId] = useState('')
     const [isOpen, setIsOpen] = useState(false)
     const [open, setOpen] = useState(false)
+    const [enabled, setEnabled] = useState(cardValues?.switch)
+    const [openImage, setOpenImage] = useState(false)
+    const [imageType, setImageType] = useState('')
 
+    const resetForm = () => {
+        setLightTheme('#ffffff')
+        setDarkTheme('#030712')
+        setLightText('#ffffff')
+        setDarkText('#030712')
+        setSelectedFont('')
+        setEditMessage('')
+        setSelectedCard('')
+        setCardValues('')
+        setFontId('')
+        setMessageId('')
+        setEnabled(cardValues?.switch)
+        setImageType('')
+    }
 
     const handleSelect = (event) => {
 
+        console.log("data: ", event.target.value)
         let data = event.target.value
         setSelectedCard(data);
 
@@ -112,29 +138,8 @@ const NewCard = () => {
         introText: Yup.string().required(),
         coverText: Yup.string().required(),
         birthdayMessage: Yup.string().required(),
+        image: Yup.string().required()
     })
-
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            template: cardValues?.template,
-            cardName: cardValues?.cardName,
-            cardTitle: cardValues?.cardTitle,
-            lightTheme: cardValues?.lightTheme,
-            darkTheme: cardValues?.darkTheme,
-            titleFont: cardValues?.selectedFont,
-            introText: cardValues?.introText,
-            coverImage: cardValues?.coverImage,
-            lightText: cardValues?.lightText,
-            darkText: cardValues?.darkText,
-            birthdayMessage: cardValues?.birthdayMessage,
-            messages: cardValues?.messages
-        },
-        validationSchema: validation,
-        onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
-        }
-    });
 
     const setBlankTheme = () => {
         setSelected({
@@ -164,12 +169,12 @@ const NewCard = () => {
         })
         console.log("form values: ", formik.values)
     }
-
-    const handleChange = (e) => {
-        console.log(e.target.files);
-        setFile(URL.createObjectURL(e.target.files[0]));
-    }
-
+    /*
+        const handleChange = (e) => {
+            console.log(e.target.files);
+            setFile(URL.createObjectURL(e.target.files[0]));
+        }
+    */
     const selectFont = (value) => {
         setFontId(value.id)
         setSelectedFont(value.fontFamily)
@@ -195,6 +200,10 @@ const NewCard = () => {
     }
 
     useEffect(() => {
+        setShowNav(false)
+    }, [])
+
+    useEffect(() => {
         setBlankTheme()
     }, [])
 
@@ -203,6 +212,15 @@ const NewCard = () => {
             dispatch(fetchCards(session.user?.id))
         }
     }, [])
+
+    useEffect(() => {
+
+        if (getCardsError) {
+            toast.error(getCardsError)
+            dispatch(resetFetchCards())
+        }
+
+    }, [getCardsError])
 
     useEffect(() => {
         if (cardId) {
@@ -216,6 +234,9 @@ const NewCard = () => {
         if (getCardMessagesError) {
             toast.error(getCardMessagesError)
         }
+
+        return () => dispatch(resetGetCardMessages())
+
     }, [getCardMessagesError])
 
     useEffect(() => {
@@ -234,15 +255,22 @@ const NewCard = () => {
 
     useEffect(() => {
         if (updatedMessage?.length > 0) {
-            //console.log('update response: ', updatedMessage)
             toast.success('The message has been updated!')
             dispatch(getCardMessages(cardId))
         }
-    }, [updatedMessage])
+
+        if (updatedMessageError) {
+            toast.error(updatedMessageError)
+        }
+
+        return () => dispatch(resetUpdateCardMessage())
+
+    }, [updatedMessage, updatedMessageError])
 
     useEffect(() => {
         if (updatedMessageError) {
             toast.error(updatedMessageError)
+            dispatch(resetUpdateCardMessage())
         }
     }, [updatedMessageError])
 
@@ -250,16 +278,18 @@ const NewCard = () => {
         if (deletedMessage) {
             setIsOpen(false)
             toast.success('The message was deleted!')
-            dispatch(getCardMessages(cardId))
+            dispatch(resetDeleteCardMessage())
         }
-    }, [deletedMessage])
 
-    useEffect(() => {
         if (deletedMessageError) {
             setIsOpen(false)
             toast.error(deletedMessageError)
         }
-    }, [deletedMessageError])
+
+        return () => dispatch(getCardMessages(cardId))
+
+    }, [deletedMessage, deletedMessageError])
+
 
     useEffect(() => {
         if (submitMessageResponse) {
@@ -267,14 +297,15 @@ const NewCard = () => {
             toast.success('Your message has been sent.')
             dispatch(getCardMessages(cardId))
         }
-    }, [submitMessageResponse])
 
-    useEffect(() => {
         if (submitMessageError) {
             setOpen(false)
             toast.error(submitMessageError)
         }
-    }, [submitMessageError])
+
+        return () => dispatch(resetSubmitMessage())
+
+    }, [submitMessageResponse, submitMessageError])
 
     const cardlink = `http://localhost:3000/card/${cardId}`
     const previewlink = `http://localhost:3000/preview/${cardId}`
@@ -299,8 +330,12 @@ const NewCard = () => {
     }, [cards, cardValues])
 
     useEffect(() => {
-        console.log("preview state: ", preview)
-    }, [preview])
+        if (cardValues?.switch) {
+            setEnabled(true)
+        } else {
+            setEnabled(false)
+        }
+    }, [cardValues])
 
     const confirm = () => {
         dispatch(deleteCardMessage(messageId))
@@ -314,25 +349,130 @@ const NewCard = () => {
         setOpen(false)
     }
 
+    const handleImageChange = (e) => {
+        let files = e.target.files[0];
+        setFile(files)
+        setImageType('uploaded')
+    }
+
+    const uploadImage = () => {
+        if (file) {
+            let imageData = {
+                filePath: `${cardId}/${file?.name}`,
+                file: file
+            }
+            dispatch(uploadCardImage(imageData))
+        }
+    }
+
+    const removeImage = () => {
+        if (file) {
+            setFile(null)
+            setImageType('')
+
+            // Reset file input value
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    }
+
+    const openImages = () => {
+        setOpenImage(true)
+    }
+
+    const selectImage = (value) => {
+        setFile(value)
+        setImageType('template')
+        setOpenImage(false)
+    }
+
+    const closeImages = () => {
+        setOpenImage(false)
+    }
+
+
+    const formik = useFormik({
+        enableReinitialize: true,
+        initialValues: {
+            template: cardValues?.template,
+            cardName: cardValues?.cardName,
+            cardTitle: cardValues?.cardTitle,
+            lightTheme: cardValues?.lightTheme,
+            darkTheme: cardValues?.darkTheme,
+            titleFont: cardValues?.selectedFont,
+            introText: cardValues?.introText,
+            coverImage: cardValues?.coverImage,
+            lightText: cardValues?.lightText,
+            darkText: cardValues?.darkText,
+            birthdayMessage: cardValues?.birthdayMessage,
+            messages: cardValues?.messages,
+            image: cardValues?.image,
+            daySwitch: enabled
+        },
+        validationSchema: validation,
+        onReset: () => {
+            //resetForm()
+        },
+        onSubmit: values => {
+            alert(JSON.stringify(values, null, 2));
+            let cardData = {
+                id: cardId,
+                image: "",
+                template: values?.template,
+                cardName: values.cardName,
+                cardTitle: values.cardTitle,
+                lightTheme: lightTheme,
+                darkTheme: darkTheme,
+                titleFont: values.titleFont,
+                introText: values.introText,
+                coverImage: values.coverImage,
+                lightText: lightText,
+                darkText: darkText,
+                birthdayMessage: values.birthdayMessage,
+                messages: values.messages,
+                layout: "default",
+                switch: enabled
+            }
+            dispatch(updateCard(cardData))
+        }
+    });
+
+    useEffect(() => {
+        if (selectedCard) {
+            console.log("selected card id: ", selectedCard)
+        }
+    }, [selectedCard])
+
+    useEffect(() => {
+        if (updatedCardData) {
+            resetForm()
+            dispatch(resetUpdateCard())
+        }
+    }, [updatedCardData])
+
 
     return (
         <>
+            <TemplateImages open={openImage} closeImages={closeImages} selectImage={selectImage} />
             <MessageDialog cardId={cardId} open={open} closeSendMessage={closeSendMessage} sendMessageLoading={submitMessageLoading} />
             <ConfirmDialog isOpen={isOpen} confirm={confirm} closeConfirm={closeConfirm} deletedMessageLoading={deletedMessageLoading} />
             {!preview ?
                 <div className='relative w-full flex flex-col space-y-3 rounded-lg p-4'>
 
-                    <div className='w-full h-24 flex flex-col py-5'>
+                    <p className='font-semibold text-xl md:text-3xl'>Edit page</p>
 
-                        <p className="text-sm/6 text-gray-950">{'Select card'}</p>
+                    <div className='w-full lg:h-24 py-5'>
 
-                        <div className='w-full h-16 flex flex-row'>
+                        <p className="text-sm/6 text-gray-950">{'Select page'}</p>
 
-                            <div className='relative w-1/3 h-full py-1'>
+                        <div className='w-full mt-4 lg:h-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'>
+
+                            <div className='relative w-full h-full py-1 md:pr-4'>
                                 {cardsLoading ?
-                                    <div className='w-80 h-12 animate-pulse bg-slate-400 rounded'></div>
+                                    <div className='relative w-full h-12 animate-pulse bg-slate-400 rounded'></div>
                                     :
-                                    <select value={selectedCard} onChange={handleSelect} className='w-80 h-12 rounded-lg px-2 py-1'>
+                                    <select value={selectedCard} onChange={handleSelect} className='relative w-full md:w-80 h-12 rounded-lg px-2 py-1'>
                                         <option value="">--Select--</option>
                                         {cards?.map((card) => (
                                             <option key={card?.card_id} value={card?.card_id}>{card?.card_data.cardName}</option>
@@ -341,19 +481,37 @@ const NewCard = () => {
                                 }
                             </div>
 
-                            <div className='relative w-2/3 h-full py-1 flex flex-row'>
+                            <div className='relative w-full h-full py-1 flex flex-row px-3'>
                                 {selectedCard &&
                                     <>
-                                        <div className='w-96 h-12 flex flex-row pt-2 rounded-lg line-clamp-1'>
-                                            <p className='line-clamp-1'>{cardlink}</p>
+                                        <div className='relative h-12 flex flex-row pt-2 rounded-lg line-clamp-1'>
+                                            <p className='text-xs mt-2 line-clamp-1'>{cardlink}</p>
                                         </div>
                                         <Tooltip title={'Click here to copy the link and share with the recipient, friends and loved ones!'}>
-                                            <button className='w-10 h-10 rounded-lg hover:border-2 border-gray-900' onClick={() => copyLink(cardlink)}>
+                                            <button className='ml-auto md:ml-3 w-10 h-10 rounded-lg hover:border-2 border-gray-900' onClick={() => copyLink(cardlink)}>
                                                 <CopyAllOutlined />
                                             </button>
                                         </Tooltip>
                                     </>
                                 }
+                            </div>
+
+                            <div className='relative w-full h-full py-1 flex flex-row px-3'>
+
+                                {selectedCard &&
+                                    <>
+                                        <p className="text-sm/6 mr-5 text-gray-950">Enable Dark Mode Switch:</p>
+
+                                        <Switch
+                                            checked={enabled}
+                                            onChange={() => setEnabled(!enabled)}
+                                            className="group inline-flex h-6 w-11 ml-5 items-center rounded-full bg-gray-200 transition data-[checked]:bg-gray-950"
+                                        >
+                                            <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
+                                        </Switch>
+                                    </>
+                                }
+
                             </div>
 
                         </div>
@@ -376,14 +534,16 @@ const NewCard = () => {
                             </div>
 
 
-                            <CardLayoutForm formik={formik} handleChange={handleChange} backgroundDark={darkTheme}
+                            <CardLayoutForm formik={formik} handleImageChange={handleImageChange} backgroundDark={darkTheme}
                                 lightTheme={lightTheme} setLightTheme={setLightTheme} selectFont={selectFont} darkTheme={darkTheme}
                                 setDarkTheme={setDarkTheme} colorButtonDisabled={selected.template !== 'default'} lightText={lightText}
                                 setLightText={setLightText} darkText={darkText} setDarkText={setDarkText} messages={cardMessages}
                                 selectMessage={selectMessage} editMessage={editMessage} changeEditMessage={changeEditMessage} messageId={messageId}
                                 updatedMessageLoader={updatedMessageLoading} updateCardMessage={cardMessageUpdate} selectedFont={selectedFont}
                                 fontId={fontId} link={link} copyLink={copyLink} deleteCardMessage={() => setIsOpen(true)} submitMessage={() => setOpen(true)}
-                                submitMessageLoader={submitMessageLoading} cardMessagesLoading={cardMessagesLoading}
+                                submitMessageLoader={submitMessageLoading} cardMessagesLoading={cardMessagesLoading} uploadLoader={imageLoading}
+                                uploadImage={uploadImage} file={file} removeImage={removeImage} ref={fileInputRef} openImages={openImages}
+                                imageType={imageType}
                             />
 
                         </>
@@ -404,6 +564,7 @@ const NewCard = () => {
                     lightText={lightText} darkText={darkText} titleFont={selectedFont}
                     introText={formik?.values.introText} coverImage={file} messages={cardMessages}
                     birthdayMessage={formik?.values.birthdayMessage}
+                    daySwitch={enabled}
                 />
             }
         </>

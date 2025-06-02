@@ -16,11 +16,14 @@ import { toast } from 'react-hot-toast'
 //////////////---Nanoid imports---////////////////////
 import { nanoid } from "nanoid";
 
-//////////////---Paddlen imports---////////////////////
+//////////////---Paddle imports---////////////////////
 import { initializePaddle, Paddle } from '@paddle/paddle-js';
 
 //////////////---API imports---////////////////////
 import { getUserProfile } from "../Pages/Slices/GetUserProfile";
+import { updateCredits } from "../Pages/Slices/UpdateCredits";
+import { updateProfile } from "../AuthPages/SignupSlice/profileUpdate";
+import { createCard } from "../Pages/Slices/CreateCard";
 
 
 
@@ -42,67 +45,48 @@ const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const [preview, setPreview] = useState(false)
   const [card, setCard] = useState(null)
+  const [isCheckoutLoaded, setIsCheckoutLoaded] = useState(false);
   // Create a local state to store Paddle instance
   const [paddle, setPaddle] = useState();
+  const [credits, setCredits] = useState(0)
+  const [panel, setPanel] = useState(false)
+  const [device, setDevice] = useState('');
+  const [showNav, setShowNav] = useState(false);
+  const [itemQuantity, setItemQuantity] = useState()
+  const [purchaseData, setPurchaseData] = useState()
+
+  const handleDeviceDetection = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android|blackberry|windows phone/g.test(userAgent);
+    const isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/g.test(userAgent);
+
+    if (isMobile) {
+      setDevice('Mobile');
+    } else if (isTablet) {
+      setDevice('Tablet');
+    } else {
+      console.log("Device is a desktop")
+      setDevice('Desktop');
+    }
+  };
 
   const togglePreview = () => {
     setPreview(!preview)
   }
-
-  const setPreviewValues = (value) => {
-    setCard(value)
-  } 
-
-  const clearPreviewValues = () => {
-    setCard(null)
-  }
-
-  const checkUserEmail = async (id, userName, userEmail) => {
-    try {
-      console.log("search")
-      const { data, error } = await supabase
-        .from('profiles')
-        .select()
-        .eq('user_name', `${userName}`)
-
-      console.log("retrieved value: ", data)
-
-      if (data?.length) {
-
-        console.log("retrieved value: ", data)
-        console.log("not exist")
-
-      } else {
-
-        console.log("not exist")
-        const { error } = await supabase
-          .from('profiles')
-          .insert({ id: id, user_name: userName, email: userEmail, date: new Date() })
-
-        if (error) {
-          toast.error('User details could not be updated.')
-        }
-
-      }
-
-    } catch (error) {
-      toast.error(error)
-      return false
-    }
-  }
-
+/*
   const createCard = async (name, userId) => {
 
     const postId = nanoid(14)
-    console.log("post id: ",postId)
+    console.log("post id: ", postId)
 
     const { error } = await supabase
       .from('cards')
-      .insert({ 
+      .insert({
         creator_id: userId,
         card_id: postId,
         paid: 'free',
         card_data: {
+          "image": "",
           "template": "default",
           "cardName": "first",
           "cardTitle": "happy birthday",
@@ -115,10 +99,11 @@ const AuthContextProvider = ({ children }) => {
           "darkText": "#030712",
           "birthdayMessage": "Finish message here",
           "messages": null,
-          "layout": "default"
+          "layout": "default",
+          "switch": true
         },
         created_at: new Date()
-       })
+      })
       .eq('creator_id', userId)
 
     if (error) {
@@ -132,23 +117,20 @@ const AuthContextProvider = ({ children }) => {
     }
 
   }
+*/
 
   const pushToProfile = async (firstName, lastName, name, userId) => {
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ first_name: firstName, last_name: lastName, user_name: name, credits: 0 })
-      .eq('id', userId)
-
-    if (error) {
-
-      toast.error('User details could not be updated.')
-
-    } else {
-
-      createCard(name, userId)
-
+    let profileData = {
+      first_name: firstName,
+      last_name: lastName,
+      user_name: name,
+      userId: userId
     }
+
+    dispatch(updateProfile(profileData))
+
+    //createCard(name, userId)
 
   }
 
@@ -165,7 +147,16 @@ const AuthContextProvider = ({ children }) => {
       if (data && data?.session) {
         setLoading(false)
         console.log('user data: ', data)
+        const postId = nanoid(14)
+        let pageData = {
+          cardName: 'First page',
+          cardTitle: 'First page',
+          userId: data.user.id,
+          postId: postId,
+          type: 'free',
+      }
         pushToProfile(firstName, lastName, userName, data.user.id)
+        dispatch(createCard(pageData))
       }
 
       if (error) {
@@ -184,36 +175,6 @@ const AuthContextProvider = ({ children }) => {
 
   }
 
-  const signInWithEmail = async (userEmail, userPassword) => {
-
-    try {
-      setLoading(true)
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: userEmail,
-        password: userPassword
-      })
-
-      if (data) {
-        setLoading(false)
-        console.log('user data: ', data)
-      }
-
-      if (error) {
-        setLoading(false)
-        console.log('error data: ', error)
-        toast.error(error.message)
-      }
-
-    } catch (error) {
-      setLoading(false)
-      toast.error(error.message)
-    }
-
-    setLoading(false)
-
-  }
-
   const signOut = async () => {
 
     const { error } = await supabase.auth.signOut()
@@ -221,14 +182,27 @@ const AuthContextProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    
+
+    handleDeviceDetection();
+    window.addEventListener('resize', handleDeviceDetection);
+
+    return () => {
+      window.removeEventListener('resize', handleDeviceDetection);
+    };
+  }, []);
+
+  useEffect(() => {
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-      dispatch(getUserProfile(session?.user.id))
+      if (session?.user.id) {
+        console.log("user session: ", session)
+        dispatch(getUserProfile(session?.user.id))
+      }
     })
 
     return () => authListener.subscription.unsubscribe()
@@ -236,48 +210,78 @@ const AuthContextProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    //Paddle.Environment.set("sandbox");
-    initializePaddle({ 
-      environment: process.env.PADDLE_ENVIRONMENT_KEY, 
-      token: process.env.PADDLE_AUTH_TOKEN 
-    }).then(
-      (paddleInstance) => {
-        if (paddleInstance) {
-          setPaddle(paddleInstance);
+
+    if (session) {
+      const authToken = process.env.REACT_APP_PADDLE_AUTH_TOKEN
+      initializePaddle({
+        environment: 'sandbox',
+        token: authToken,
+        eventCallback: (checkoutData) => {
+          console.log("callback event: ", checkoutData)
+          if (checkoutData.name == "checkout.completed") {
+            console.log("update purchases")
+            console.log("user id: ", session?.user.id)
+            setPurchaseData({
+              order_id: checkoutData?.data.id,
+              transaction_id: checkoutData?.data.transaction_id,
+              user_id: session.user?.id,
+              status: 'paid',
+              purchased_at: new Date(),
+              price_id: checkoutData?.data.items[0]?.price_id
+            })
+          } else if (checkoutData.name == "checkout.warning") {
+            console.log("checkout warning: ", checkoutData.name)
+            toast.error(checkoutData?.error.detail)
+          } else if (checkoutData.name == "checkout.error") {
+            console.log("checkout failed: ", checkoutData.name)
+            toast.error(checkoutData?.error.detail)
+          }
         }
-      },
-    );
-  }, []);
+      }).then(
+        (paddleInstance) => {
+          if (paddleInstance) {
+            setPaddle(paddleInstance);
+          }
+        },
+      );
+    }
 
-  const updateCredits = (value) => {
-    console.log("credits: ",value)
-  }
+  }, [session]);
 
-  const openCheckout = (priceId, email, quantity) => {
+  const openCheckout = (priceId, quantity) => {
+
+    console.log('product id: ', quantity)
+    setItemQuantity(quantity)
+
+    if (!paddle) return console.log("Paddle not initialized!")
 
     var settings = {
+      allowedPaymentMethods: ["card", "apple_pay", "google_pay"],
       displayMode: "overlay",
       theme: "light",
       locale: "en",
       frameTarget: "checkout-container",
       frameStyle: "min-width: 600px;",
-      frameInitialHeight: "450"
+      frameInitialHeight: "450",
+      quantity: quantity
     };
 
+    let items = [{ priceId: priceId, quantity: quantity }]
 
     paddle?.Checkout.open({
       settings: settings,
-      items: [{ priceId: priceId, quantity: quantity }],
+      items: items,
       customer: {
-        email: email
-      },
-      successCallback: updateCredits(userProfile?.credits)
+        email: session?.user.email
+      }
     });
+
+    setPanel(!panel)
   };
-  
+
 
   return (
-    <AuthContext.Provider value={{ session, loading, preview, togglePreview, signInWithEmail, signUpWithEmail, signOut, openCheckout }}>
+    <AuthContext.Provider value={{ showNav, setShowNav, device, session, loading, preview, itemQuantity, panel, purchaseData, credits, setPanel, setPurchaseData, setCredits, togglePreview, signUpWithEmail, signOut, openCheckout }}>
       {children}
     </AuthContext.Provider>
   )

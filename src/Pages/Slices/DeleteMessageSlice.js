@@ -19,15 +19,20 @@ export const deleteCardMessage = createAsyncThunk("deletemessage/deleteCardMessa
 }
 );
 
+const initialState = {
+    deletedMessage: null,
+    deletedMessageLoading: false,
+    deletedMessageError: null,
+}
 
 const deleteCardMessageSlice = createSlice({
     name: "deletemessage",
-    initialState: {
-        deletedMessage: null,
-        deletedMessageLoading: false,
-        deletedMessageError: null,
+    initialState,
+    reducers: {
+        resetDeleteCardMessage: (state,action) => {
+            return initialState
+        }
     },
-    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(deleteCardMessage.pending, (state) => {
@@ -44,6 +49,8 @@ const deleteCardMessageSlice = createSlice({
             })
     },
 });
+
+export const { resetDeleteCardMessage } = deleteCardMessageSlice.actions
 
 export default deleteCardMessageSlice.reducer;
 

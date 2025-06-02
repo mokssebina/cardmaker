@@ -9,7 +9,6 @@ import Purchases from '../Pages/BuilderPages/Purchases'
 import { PrivateRoutes } from './PrivateRoutes'
 import { PublicRoutes } from './PublicRoutes'
 import { OpenRoutes } from './OpenRoutes'
-import { PrivatePreviewRoutes } from './PrivatePreviewRoutes'
 import Signin from '../AuthPages/Signin'
 import { useAuth } from '../Context/AuthContext'
 import Signup from '../AuthPages/Signup'
@@ -52,17 +51,17 @@ const AppRoutes = () => {
 
         <Route index path={'/'} element={<Navigate to='/message:card_id' />} />
         <Route index path={'/message/:card_id'} element={<MessageForm />} />
-        <Route index path={'/card/:card_id'} element={<Card />} />
+        <Route index path={'/page/:card_id'} element={<Card />} />
 
       </Route>
       
       {/*------------------Private Routes------------------*/}
       <Route path={'/'} element={<PrivateRoutes authUser={session?.user} />}>
 
-        <Route index path={'/'} element={<Navigate to='/cards' />} />
-        <Route path={'/cards'} element={<Cards />} />
-        <Route path={'/edit-card'} element={<NewCard />} />
-        <Route path={'/edit-card'} element={<NewCard />} />
+        <Route index path={'/'} element={<Navigate to='/pages' />} />
+        <Route path={'/pages'} element={<Cards />} />
+        <Route path={'/edit-page'} element={<NewCard />} />
+        {/*<Route path={'/edit-page'} element={<NewCard />} />*/}
         <Route path={'/purchases'} element={<Purchases />} />
         <Route path={'/preview/:card_id'} element={<CardPreview />} />
 

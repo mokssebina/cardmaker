@@ -18,15 +18,20 @@ export const getCardMessages = createAsyncThunk("getcardmessages/getCardMessages
   }
 );
 
+const initialState = {
+  cardMessages: null,
+  cardMessagesLoading: false,
+  getCardMessagesError: null,
+}
 
 const getCardMessagesSlice = createSlice({
   name: "getcardmessages",
-  initialState: {
-    cardMessages: null,
-    cardMessagesLoading: false,
-    getCardMessagesError: null,
+  initialState,
+  reducers: {
+    resetGetCardMessages: (state, action) => {
+      return initialState
+    }
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getCardMessages.pending, (state) => {
@@ -43,6 +48,8 @@ const getCardMessagesSlice = createSlice({
       })
   },
 });
+
+export const { resetGetCardMessages } = getCardMessagesSlice.actions
 
 export default getCardMessagesSlice.reducer;
 
