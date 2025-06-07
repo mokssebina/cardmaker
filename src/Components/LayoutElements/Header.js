@@ -40,10 +40,10 @@ const Header = ({ showNav, device }) => {
   }
 
   useEffect(() => {
-    if(userProfile){
-      console.log("user profile: ",userProfile)
+    if (userProfile) {
+      console.log("user profile: ", userProfile)
     }
-  },[])
+  }, [])
 
   useEffect(() => {
     if (updatedPurchases?.length > 0) {
@@ -92,14 +92,14 @@ const Header = ({ showNav, device }) => {
       <div className='absolute h-12 right-3 text-center items-center align-middle flex flex-row'>
         {profileLoading || creditsLoading && <div className='relative w-14 h-4 my-auto rounded-sm bg-slate-400 animate-pulse'></div>}
         {(!profileLoading || !creditsLoading) &&
-          <>
+          <Tooltip title={!userProfile[0]?.credits ? 'Your out of credits. Please buy more' : ''}>
             {userProfile?.length &&
-              <Tooltip title={!userProfile[0]?.credits ? 'Your out of credits. Please buy more' : ''}>
+              <>
                 <p className='mr-4'>{userProfile !== null && userProfile[0]?.credits}</p>
                 <PaymentsIcon />
-              </Tooltip>
+              </>
             }
-          </>
+          </Tooltip>
         }
       </div>
 

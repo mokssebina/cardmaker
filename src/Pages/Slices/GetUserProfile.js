@@ -22,7 +22,7 @@ export const getUserProfile = createAsyncThunk("getuserprofile/getUserProfile",a
 const getUserProfileSlice = createSlice({
   name: "getuserprofile",
   initialState: {
-    userProfile: null,
+    userProfile: [],
     profileLoading: false,
     profileError: null,
   },

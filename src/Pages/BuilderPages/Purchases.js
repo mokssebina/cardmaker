@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
 //////////////---Context imports---////////////////////
 import { useAuth } from '../../Context/AuthContext'
@@ -27,6 +27,8 @@ import { cardBundles } from './bundles';
 
 //////////////---Screen imports---////////////////////
 import PurchasesLoader from '../../Components/ScreenElements/PuchasesElements/PurchasesLoader';
+import PurchaseItem from '../../Components/ScreenElements/PuchasesElements/PurchaseItem';
+
 
 
 const Purchases = () => {
@@ -61,6 +63,7 @@ const Purchases = () => {
     return findName[0]?.price
   }
 
+
   return (
     <div className='relative w-full flex flex-col space-y-3 rounded-lg p-4'>
 
@@ -72,51 +75,16 @@ const Purchases = () => {
 
         {(!purchasesLoading && purchases) &&
           <>
-            {purchases?.map((item) => (
-              <Disclosure as="div" className='w-full rounded-md mb-1 border border-gray-900'>
-
-                {({ open }) => (
-                  <>
-                    <DisclosureButton className="w-full py-2 px-2">
-                      <div className='w-full h-12 flex flex-row'>
-                        <div className='w-1/2 h-full flex flex-row items-center'>
-                          <p className='text-sm md:text-base text-left'>{`Product Name: ${getProductName(item?.price_id)}`}</p>
-                        </div>
-                        <div className='w-1/2 h-full items-center flex flex-row'>
-                          <div className='h-full ml-auto flex flex-row items-center'>
-                            <p className='text-base text-right mr-3'>{`$ ${getProductPrice(item?.price_id)}`}</p>
-                            <ChevronRightIcon className={clsx('w-5', open && 'rotate-90')} />
-                          </div>
-                        </div>
-                      </div>
-                    </DisclosureButton>
-                    <DisclosurePanel className="text-gray-500">
-                      <div className='w-full h-28 p-2 flex flex-col'>
-                        <div className='w-full h-12 flex flex-col md:flex-row'>
-                          <div className='w-full md:w-1/2 h-full flex flex-row items-center'>
-                            <p className='text-xs md:text-base text-left'>{`Transaction ID: ${item?.transaction_id}`}</p>
-                          </div>
-                          <div className='w-full md:w-1/2 h-full flex flex-row items-center'>
-                            <p className='text-xs md:text-base text-left'>{`Order ID: ${item?.order_id}`}</p>
-                          </div>
-                        </div>
-
-                        <div className='w-full h-12 flex flex-col md:flex-row'>
-                          <div className='w-full md:w-1/2 h-full flex flex-row items-center'>
-                            <p className='text-xs md:text-base text-left'>{`Price ID: ${item?.price_id}`}</p>
-                          </div>
-                          <div className='w-full md:w-1/2 h-full flex flex-row items-center'>
-                            <p className='text-xs md:text-base text-left'>{`Purchased at: ${item?.purchased_at}`}</p>
-                          </div>
-                        </div>
-
-                      </div>
-                    </DisclosurePanel>
-                  </>
-                )}
-
-              </Disclosure>
-            ))}
+            {/*purchases?.map((item) => (
+              <PurchaseItem
+                productName={getProductName(item?.price_id)}
+                productPrice={getProductPrice(item?.price_id)}
+                transactionId={item?.transaction_id}
+                orderId={item?.order_id}
+                priceId={item?.price_id}
+                purchaseDate={item?.purchased_at}
+              />
+            ))*/}
           </>
         }
 
